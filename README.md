@@ -5,7 +5,7 @@ Quellcode bewusst öffentlich als C#-Showcase.
 
 **Live:**
 - 🌐 [lykon-tech.de](https://lykon-tech.de) (Hetzner, Hauptdomain)
-- 📄 [malibay81.github.io/portfolio](https://malibay81.github.io/portfolio/) (GitHub Pages)
+- 📄 [malibay81.github.io/PORTFOLIO](https://malibay81.github.io/PORTFOLIO/) (GitHub Pages)
 
 > *English: Multilingual portfolio one-pager (German / English / Turkish) built
 > with Blazor WebAssembly. The source is intentionally public as a C# showcase.*
@@ -43,7 +43,7 @@ einmal und deployt sie bei jedem Push auf `main` an **zwei Ziele**:
 
 | Ziel | Pfad | Mechanik |
 |---|---|---|
-| GitHub Pages | `/portfolio/` (Unterpfad) | `actions/deploy-pages`, `<base href>` wird umgeschrieben |
+| GitHub Pages | `/PORTFOLIO/` (Unterpfad) | `actions/deploy-pages`, `<base href>` wird umgeschrieben |
 | Hetzner-Server | `/` unter `lykon-tech.de` | rsync per SSH nach `/var/www/portfolio`, Caddy liefert statisch aus |
 
 ### Einmalige Einrichtung

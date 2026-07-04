@@ -40,11 +40,11 @@ jobs:
         run: dotnet publish src/Portfolio/Portfolio.csproj -c Release -o publish
 
       # Ein Build, zwei Varianten: nur die <base href> unterscheidet sich.
-      - name: Variante für GitHub Pages (Unterpfad /portfolio/)
+      - name: Variante für GitHub Pages (Unterpfad /PORTFOLIO/)
         run: |
           mkdir -p out-pages
           cp -r publish/wwwroot/. out-pages/
-          sed -i 's|<base href="/" />|<base href="/portfolio/" />|' out-pages/index.html
+          sed -i 's|<base href="/" />|<base href="/PORTFOLIO/" />|' out-pages/index.html
           touch out-pages/.nojekyll
 
       - name: Variante für Hetzner (Root-Pfad)
