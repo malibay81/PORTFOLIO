@@ -37,33 +37,10 @@ dotnet run --project src/Portfolio/Portfolio.csproj
 
 ## Deployment
 
-`main` ist der einzige Deploy-Branch. Der Workflow
-[`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) baut die App
-einmal und deployt sie bei jedem Push auf `main` an **zwei Ziele**:
-
-| Ziel | Pfad | Mechanik |
-|---|---|---|
-| GitHub Pages | `/PORTFOLIO/` (Unterpfad) | `actions/deploy-pages`, `<base href>` wird umgeschrieben |
-| Hetzner-Server | `/` unter `lykon-tech.de` | rsync per SSH nach `/var/www/portfolio`, Caddy liefert statisch aus |
-
-### Einmalige Einrichtung
-
-1. **GitHub Pages** aktivieren: Repo → Settings → Pages → Source = *GitHub Actions*.
-2. **Secrets** für das Hetzner-Deployment (Repo → Settings → Secrets → Actions);
-   solange sie fehlen, wird der Hetzner-Schritt einfach übersprungen:
-   - `HETZNER_HOST` – Server-IP oder Domain
-   - `HETZNER_USER` – Deploy-User (z. B. `deploy`)
-   - `HETZNER_SSH_KEY` – privater Deploy-SSH-Key (separater Key, nicht der persönliche)
-3. **Caddy** auf dem Server: `lykon-tech.de` mit `root /srv/portfolio` +
-   `file_server` (siehe Caddyfile im [COCKPIT-Repo](https://github.com/malibay81/COCKPIT),
-   das den gemeinsamen Reverse-Proxy stellt).
-
-### SPA-Routing auf GitHub Pages
-
-`404.html` leitet tiefe Links (z. B. `/impressum`) per Query-Parameter auf
-`index.html` um; die ursprüngliche URL wird dort über die History-API
-wiederhergestellt. Auf dem Hetzner-Server übernimmt Caddy das direkt via
-`try_files {path} /index.html`.
+`main` ist der einzige Deploy-Branch: Ein GitHub-Actions-Workflow baut die App
+bei jedem Push automatisch und veröffentlicht sie auf GitHub Pages sowie auf
+einem privaten Server (Details im Workflow:
+[`.github/workflows/deploy.yml`](.github/workflows/deploy.yml)).
 
 ## Lizenz
 
