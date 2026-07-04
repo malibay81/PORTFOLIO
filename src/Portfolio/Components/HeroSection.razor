@@ -1,0 +1,191 @@
+@inject TranslationService T
+@implements IDisposable
+
+<!-- ═══════════════════════════════════════════════════════════
+     HERO
+════════════════════════════════════════════════════════════ -->
+<section id="hero" class="hero-section">
+    <MudContainer MaxWidth="MaxWidth.Large">
+        <MudGrid Justify="Justify.Center">
+            <MudItem xs="12" md="7" lg="6">
+                <div class="hero-content">
+                    <div class="hero-greeting">@T["hero.greeting"]</div>
+
+                    <h1 class="hero-name gradient-text">@T["hero.name"]</h1>
+
+                    <div class="hero-title">
+                        <TypewriterText
+                            Words="_typewriterWords"
+                            TypingSpeedMs="80"
+                            DeletingSpeedMs="40"
+                            PauseAfterTypingMs="2000"
+                            PauseAfterDeletingMs="500" />
+                    </div>
+
+                    <p class="hero-subtitle">@HeroSubtitle</p>
+
+                    <div class="available-badge mb-6">
+                        <span class="dot"></span>
+                        @T["about.available"]
+                    </div>
+
+                    <div class="hero-cta">
+                        <MudButton Variant="Variant.Filled"
+                                   Color="Color.Primary"
+                                   Size="Size.Large"
+                                   EndIcon="@Icons.Material.Filled.ArrowForward"
+                                   Style="border-radius:12px; padding: 12px 28px; font-weight:600;"
+                                   OnClick='() => ScrollTo("demos")'>
+                            @T["hero.cta.projects"]
+                        </MudButton>
+
+                        <MudButton Variant="Variant.Outlined"
+                                   Color="Color.Primary"
+                                   Size="Size.Large"
+                                   EndIcon="@Icons.Material.Filled.Email"
+                                   Style="border-radius:12px; padding: 12px 28px; font-weight:600;"
+                                   OnClick='() => ScrollTo("contact")'>
+                            @T["hero.cta.contact"]
+                        </MudButton>
+                    </div>
+                </div>
+            </MudItem>
+
+            <!-- Tech-Stack-Chips (Desktop) -->
+            <MudItem xs="12" md="5" lg="6" Class="d-none d-md-flex justify-center">
+                <div style="display:flex; flex-direction:column; gap:16px; align-items:flex-start; padding:32px;">
+                    @foreach (var group in _skillGroups)
+                    {
+                        <div style="display:flex; flex-wrap:wrap; gap:10px;">
+                            @foreach (var skill in group)
+                            {
+                                <span class="skill-chip">@skill</span>
+                            }
+                        </div>
+                    }
+                </div>
+            </MudItem>
+        </MudGrid>
+    </MudContainer>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     QUICK STATS
+════════════════════════════════════════════════════════════ -->
+<MudContainer MaxWidth="MaxWidth.Large" Class="section">
+    <MudGrid Justify="Justify.Center" Spacing="4">
+        @foreach (var stat in _stats)
+        {
+            <MudItem xs="6" sm="3">
+                <div class="glass-card pa-6 text-center">
+                    <MudText Typo="Typo.h3" Class="gradient-text" Style="font-weight:800;">
+                        @stat.Value
+                    </MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary" Class="mt-1">
+                        @stat.Label
+                    </MudText>
+                </div>
+            </MudItem>
+        }
+    </MudGrid>
+</MudContainer>
+
+<!-- ═══════════════════════════════════════════════════════════
+     TECHNOLOGIEN (auch mobil sichtbar)
+════════════════════════════════════════════════════════════ -->
+<div style="background: linear-gradient(180deg, transparent, rgba(var(--mud-palette-primary-rgb),0.05), transparent);">
+    <MudContainer MaxWidth="MaxWidth.Large" Class="section">
+        <div class="section-title">
+            <MudText Typo="Typo.h4" Style="font-weight:700;">@T["skills.title"]</MudText>
+        </div>
+        <div style="display:flex; flex-wrap:wrap; gap:12px; justify-content:center;">
+            @foreach (var skill in _allSkills)
+            {
+                <span class="skill-chip">@skill</span>
+            }
+        </div>
+    </MudContainer>
+</div>
+
+@code {
+    [Inject] private IJSRuntime JS { get; set; } = default!;
+
+    /// <summary>Berufserfahrung seit 2008 – wird immer dynamisch berechnet.</summary>
+    public const int CareerStartYear = 2008;
+    private static int ExperienceYears => DateTime.Now.Year - CareerStartYear;
+
+    private string HeroSubtitle =>
+        T["hero.subtitle"].Replace("{years}", ExperienceYears.ToString());
+
+    private List<string> _typewriterWords = [];
+
+    private readonly List<List<string>> _skillGroups =
+    [
+        [".NET 10", "C#", "Blazor WASM"],
+        ["WPF", "MVVM", "Entity Framework"],
+        ["Siemens TIA", "Beckhoff TwinCAT"],
+        ["CANoe", "CANape", "CANalyzer"],
+        ["SQL Server", "SQLite", "PostgreSQL"],
+        ["Git", "Azure DevOps", "CI/CD"]
+    ];
+
+    private readonly List<string> _allSkills =
+    [
+        ".NET 10", "C#", "Blazor WASM", "WPF", "Windows Forms",
+        "ASP.NET Core", "Entity Framework Core", "MVVM",
+        "Siemens S7 / TIA Portal", "Beckhoff TwinCAT",
+        "Vector CANoe", "CANape", "CANalyzer",
+        "SQL Server", "SQLite", "PostgreSQL",
+        "REST APIs", "Git", "Azure DevOps",
+        "JetBrains Rider", "Visual Studio"
+    ];
+
+    private List<(string Value, string Label)> _stats = [];
+
+    protected override void OnInitialized()
+    {
+        T.OnLanguageChanged += Refresh;
+        BuildTypewriterWords();
+        BuildStats();
+    }
+
+    private async Task ScrollTo(string id) => await JS.InvokeVoidAsync("pfScrollTo", id);
+
+    private void BuildTypewriterWords()
+    {
+        _typewriterWords = T.CurrentLanguage switch
+        {
+            "en" => ["Software Engineer", ".NET & C# Developer", "Automation Specialist", "Freelancer"],
+            "tr" => ["Yazılım Mühendisi", ".NET & C# Geliştirici", "Otomasyon Uzmanı", "Serbest Çalışan"],
+            _    => ["Software-Ingenieur", ".NET & C# Entwickler", "Automatisierungsspezialist", "Freelancer"]
+        };
+    }
+
+    private void BuildStats()
+    {
+        _stats =
+        [
+            (ExperienceYears.ToString(), T.CurrentLanguage == "de" ? "Jahre Erfahrung"
+                   : T.CurrentLanguage == "tr" ? "Yıl Deneyim"
+                   : "Years Experience"),
+            ("50+",  T.CurrentLanguage == "de" ? "Projekte"
+                   : T.CurrentLanguage == "tr" ? "Proje"
+                   : "Projects"),
+            ("10+",  T.CurrentLanguage == "de" ? "Technologien"
+                   : T.CurrentLanguage == "tr" ? "Teknoloji"
+                   : "Technologies"),
+            ("3",    T.CurrentLanguage == "de" ? "Sprachen"
+                   : T.CurrentLanguage == "tr" ? "Dil"
+                   : "Languages"),
+        ];
+    }
+
+    private void Refresh()
+    {
+        BuildTypewriterWords();
+        BuildStats();
+        StateHasChanged();
+    }
+
+    public void Dispose() => T.OnLanguageChanged -= Refresh;
+}

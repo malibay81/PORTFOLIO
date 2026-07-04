@@ -1,0 +1,19 @@
+@page "/not-found"
+@inject NavigationManager Nav
+
+<PageTitle>404 | M. Ali Bayrak</PageTitle>
+
+<div class="portfolio-page">
+    <MudContainer MaxWidth="MaxWidth.Medium" Class="py-16 text-center">
+        <MudText Typo="Typo.h2" Class="gradient-text" Style="font-weight:800;">404</MudText>
+        <MudText Typo="Typo.body1" Color="Color.Secondary" Class="mt-2 mb-6">
+            Diese Seite existiert nicht.
+        </MudText>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary"
+                   StartIcon="@Icons.Material.Filled.Home"
+                   Style="border-radius:12px;"
+                   OnClick='() => Nav.NavigateTo("")'>
+            Zur Startseite
+        </MudButton>
+    </MudContainer>
+</div>

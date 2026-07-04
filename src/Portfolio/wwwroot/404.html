@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="utf-8" />
+    <title>Weiterleitung…</title>
+    <script>
+        // GitHub-Pages-SPA-Trick: tiefe Links (z. B. /impressum) existieren als
+        // Datei nicht – wir leiten auf index.html um und geben die Route als
+        // Query-Parameter mit. index.html stellt die URL per History-API wieder her.
+        // Funktioniert für Root-Deployments (Hetzner) und Unterpfade (GitHub Pages).
+        (function () {
+            var segments = window.location.pathname.split('/').filter(Boolean);
+            // Auf GitHub Pages ist das erste Segment der Repo-Name (Unterpfad).
+            var isGh = window.location.hostname.endsWith('.github.io');
+            var basePath = isGh && segments.length > 0 ? '/' + segments[0] + '/' : '/';
+            var route = '/' + segments.slice(isGh ? 1 : 0).join('/');
+            window.location.replace(
+                window.location.origin + basePath + '?p=' + encodeURIComponent(route) + window.location.hash);
+        })();
+    </script>
+</head>
+<body>Weiterleitung…</body>
+</html>

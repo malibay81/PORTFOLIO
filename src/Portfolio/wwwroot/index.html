@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>M. Ali Bayrak – Software-Ingenieur & .NET Spezialist | LYKON-TECH</title>
+    <meta name="description" content="Portfolio von Muhammed Ali Bayrak (LYKON-TECH) – Software-Ingenieur und .NET-Spezialist seit 2008. C#, Blazor, WPF, Automatisierung, Prüfstandssoftware." />
+    <base href="/" />
+    <link rel="preload" id="webassembly" />
+    <link href="fonts/roboto.css" rel="stylesheet" />
+    <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="app.css" />
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link href="Portfolio.styles.css" rel="stylesheet" />
+    <script type="importmap"></script>
+</head>
+
+<body>
+    <div id="app">
+        <div class="pf-splash">
+            <div class="pf-splash-logo">LYKON-TECH</div>
+            <div class="pf-splash-bar"><div></div></div>
+        </div>
+    </div>
+
+    <div id="blazor-error-ui">
+        Ein unerwarteter Fehler ist aufgetreten.
+        <a href="." class="reload">Neu laden</a>
+        <span class="dismiss">🗙</span>
+    </div>
+
+    <script>
+        // GitHub-Pages-SPA-Trick: 404.html leitet tiefe Links als ?p=/route hierher um.
+        (function () {
+            var p = new URLSearchParams(window.location.search).get('p');
+            if (p) history.replaceState(null, '', p);
+        })();
+
+        // Sanftes Scrollen zu Sektionen der One-Page.
+        window.pfScrollTo = function (id) {
+            var el = document.getElementById(id);
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        };
+    </script>
+    <script src="_framework/blazor.webassembly#[.{fingerprint}].js"></script>
+    <script src="_content/MudBlazor/MudBlazor.min.js"></script>
+    <script src="js/lottie-player.js"></script>
+</body>
+
+</html>

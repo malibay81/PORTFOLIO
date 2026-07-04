@@ -1,0 +1,28 @@
+.typewriter-container {
+    display: inline-flex;
+    align-items: center;
+}
+
+.typewriter-text {
+    white-space: pre-wrap;
+    word-break: break-word;
+    color: var(--mud-palette-secondary);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.typewriter-cursor {
+    margin-left: 2px;
+    animation: blink 1s step-end infinite;
+    font-weight: bold;
+    color: var(--mud-palette-secondary);
+}
+
+@keyframes blink {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0;
+    }
+}

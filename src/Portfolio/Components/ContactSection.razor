@@ -1,0 +1,372 @@
+@inject TranslationService T
+@inject NavigationManager Nav
+@inject ISnackbar Snackbar
+@implements IDisposable
+
+<!-- ═══════════════════════════════════════════════════════════
+     KONTAKT
+════════════════════════════════════════════════════════════ -->
+<section id="contact" style="background: linear-gradient(180deg, rgba(var(--mud-palette-primary-rgb),0.07) 0%, transparent 100%); padding: 80px 0 40px;">
+    <MudContainer MaxWidth="MaxWidth.Large">
+        <MudText Typo="Typo.overline" Color="Color.Primary" Style="letter-spacing:0.2em;">
+            @T["contact.title"]
+        </MudText>
+        <MudText Typo="Typo.h3" Class="gradient-text mt-1" Style="font-weight:700;">
+            @T["contact.headline"]
+        </MudText>
+        <MudText Typo="Typo.h6" Color="Color.Secondary" Class="mt-2" Style="font-weight:400; max-width:580px;">
+            @T["contact.subline"]
+        </MudText>
+    </MudContainer>
+</section>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="pb-16">
+    <MudGrid Spacing="6">
+
+        <!-- LINKS: Direktkontakt + Verfügbarkeit + Profile -->
+        <MudItem xs="12" md="5">
+
+            <div class="glass-card pa-5 mb-4">
+                <MudText Typo="Typo.subtitle1" Style="font-weight:700; margin-bottom:16px;">
+                    <MudIcon Icon="@Icons.Material.Filled.ContactMail" Class="mr-2" Size="Size.Small" Color="Color.Primary" />
+                    @T["contact.direct"]
+                </MudText>
+
+                @foreach (var item in _contactItems)
+                {
+                    <a href="@item.Href" target="@item.Target" style="text-decoration:none; display:block;">
+                        <div class="glass-card pa-3 mb-2"
+                             style="cursor:pointer; border-radius:10px; transition: all 0.2s;">
+                            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="3">
+                                <div style="width:40px; height:40px; border-radius:10px; display:flex;
+                                            align-items:center; justify-content:center;
+                                            background: rgba(var(--mud-palette-primary-rgb),0.12);">
+                                    <MudIcon Icon="@item.Icon" Color="Color.Primary" Size="Size.Small" />
+                                </div>
+                                <div>
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">@item.Label</MudText>
+                                    <MudText Typo="Typo.body2" Style="font-weight:500;">@item.Value</MudText>
+                                </div>
+                                <MudSpacer />
+                                <MudIcon Icon="@Icons.Material.Filled.OpenInNew" Size="Size.Small"
+                                         Style="opacity:0.3; font-size:14px;" />
+                            </MudStack>
+                        </div>
+                    </a>
+                }
+            </div>
+
+            <div class="glass-card pa-5 mb-4">
+                <MudText Typo="Typo.subtitle1" Style="font-weight:700; margin-bottom:16px;">
+                    <MudIcon Icon="@Icons.Material.Filled.EventAvailable" Class="mr-2" Size="Size.Small" Color="Color.Secondary" />
+                    @T["contact.availability"]
+                </MudText>
+
+                @foreach (var item in _availability)
+                {
+                    <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2" Class="mb-3">
+                        <div style="width:8px; height:8px; border-radius:50%;
+                                    background: @(item.Available ? "var(--color-secondary)" : "#888");
+                                    @(item.Available ? "box-shadow: 0 0 6px var(--color-secondary);" : "")">
+                        </div>
+                        <MudText Typo="Typo.body2" Style="flex:1;">@item.Label</MudText>
+                        <MudChip T="string" Size="Size.Small"
+                                 Color="@(item.Available ? Color.Success : Color.Default)"
+                                 Variant="Variant.Filled"
+                                 Style="font-size:0.7rem; height:22px;">
+                            @(item.Available ? T["contact.avail.yes"] : T["contact.avail.no"])
+                        </MudChip>
+                    </MudStack>
+                }
+
+                <MudDivider Class="my-3" />
+                <MudText Typo="Typo.caption" Color="Color.Secondary">
+                    @T["contact.remote"]
+                </MudText>
+            </div>
+
+            <div class="glass-card pa-5">
+                <MudText Typo="Typo.subtitle1" Style="font-weight:700; margin-bottom:16px;">
+                    <MudIcon Icon="@Icons.Material.Filled.Work" Class="mr-2" Size="Size.Small" Color="Color.Primary" />
+                    @T["contact.profiles"]
+                </MudText>
+                @foreach (var p in _freelancerProfiles)
+                {
+                    <a href="@p.Url" target="_blank" style="text-decoration:none; display:block;">
+                        <div class="glass-card pa-3 mb-2" style="cursor:pointer; border-radius:10px; transition: all 0.2s;">
+                            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+                                <MudIcon Icon="@Icons.Material.Filled.Link" Color="Color.Primary" Size="Size.Small" />
+                                <MudText Typo="Typo.body2" Style="font-weight:500; flex:1;">@p.Name</MudText>
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">@p.Status</MudText>
+                            </MudStack>
+                        </div>
+                    </a>
+                }
+            </div>
+
+        </MudItem>
+
+        <!-- RECHTS: Kontaktformular (mailto, kein Backend) -->
+        <MudItem xs="12" md="7">
+            <div class="glass-card pa-6">
+                <MudText Typo="Typo.subtitle1" Style="font-weight:700; margin-bottom:24px;">
+                    <MudIcon Icon="@Icons.Material.Filled.Email" Class="mr-2" Size="Size.Small" Color="Color.Primary" />
+                    @T["contact.form.title"]
+                </MudText>
+
+                <MudForm @ref="_form" @bind-IsValid="_formValid">
+
+                    <MudGrid Spacing="3">
+                        <MudItem xs="12" sm="6">
+                            <MudTextField T="string"
+                                          Label="@T["contact.form.name"]"
+                                          @bind-Value="_model.Name"
+                                          Variant="Variant.Outlined"
+                                          Required="true"
+                                          RequiredError="@T["contact.form.required"]"
+                                          Adornment="Adornment.Start"
+                                          AdornmentIcon="@Icons.Material.Filled.Person"
+                                          FullWidth="true" />
+                        </MudItem>
+
+                        <MudItem xs="12" sm="6">
+                            <MudTextField T="string"
+                                          Label="@T["contact.form.company"]"
+                                          @bind-Value="_model.Company"
+                                          Variant="Variant.Outlined"
+                                          Adornment="Adornment.Start"
+                                          AdornmentIcon="@Icons.Material.Filled.Business"
+                                          FullWidth="true" />
+                        </MudItem>
+
+                        <MudItem xs="12">
+                            <MudTextField T="string"
+                                          Label="@T["contact.form.email"]"
+                                          @bind-Value="_model.Email"
+                                          Variant="Variant.Outlined"
+                                          Required="true"
+                                          RequiredError="@T["contact.form.required"]"
+                                          Validation="@(new Func<string, string?>(v => v.Contains('@') && v.Contains('.') ? null : T["contact.form.required"]))"
+                                          Adornment="Adornment.Start"
+                                          AdornmentIcon="@Icons.Material.Filled.Email"
+                                          FullWidth="true" />
+                        </MudItem>
+
+                        <MudItem xs="12">
+                            <MudSelect T="string"
+                                       Label="@T["contact.form.type"]"
+                                       @bind-Value="_model.InquiryType"
+                                       Variant="Variant.Outlined"
+                                       Adornment="Adornment.Start"
+                                       AdornmentIcon="@Icons.Material.Filled.Category"
+                                       FullWidth="true">
+                                @foreach (var t in _inquiryTypes)
+                                {
+                                    <MudSelectItem Value="@t">@t</MudSelectItem>
+                                }
+                            </MudSelect>
+                        </MudItem>
+
+                        <MudItem xs="12">
+                            <MudTextField T="string"
+                                          Label="@T["contact.form.subject"]"
+                                          @bind-Value="_model.Subject"
+                                          Variant="Variant.Outlined"
+                                          Required="true"
+                                          RequiredError="@T["contact.form.required"]"
+                                          Adornment="Adornment.Start"
+                                          AdornmentIcon="@Icons.Material.Filled.Subject"
+                                          FullWidth="true" />
+                        </MudItem>
+
+                        <MudItem xs="12">
+                            <MudTextField T="string"
+                                          Label="@T["contact.form.message"]"
+                                          @bind-Value="_model.Message"
+                                          Variant="Variant.Outlined"
+                                          Required="true"
+                                          RequiredError="@T["contact.form.required"]"
+                                          Lines="6"
+                                          FullWidth="true"
+                                          Counter="500"
+                                          MaxLength="500" />
+                        </MudItem>
+
+                        <MudItem xs="12">
+                            <MudCheckBox T="bool"
+                                         @bind-Value="_model.AcceptPrivacy"
+                                         Required="true"
+                                         Color="Color.Primary">
+                                <MudText Typo="Typo.body2">@T["contact.form.privacy"]</MudText>
+                            </MudCheckBox>
+                        </MudItem>
+
+                        <MudItem xs="12">
+                            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="3">
+                                <MudButton Variant="Variant.Filled"
+                                           Color="Color.Primary"
+                                           Size="Size.Large"
+                                           StartIcon="@Icons.Material.Filled.Send"
+                                           Style="border-radius:12px; padding:12px 32px; font-weight:600;"
+                                           Disabled="@(!_formValid || _sending)"
+                                           OnClick="Submit">
+                                    @if (_sending)
+                                    {
+                                        <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
+                                        @T["contact.form.sending"]
+                                    }
+                                    else
+                                    {
+                                        @T["contact.form.send"]
+                                    }
+                                </MudButton>
+
+                                @if (_sent)
+                                {
+                                    <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                                        <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" Size="Size.Small" />
+                                        <MudText Typo="Typo.body2" Color="Color.Success">@T["contact.form.sent"]</MudText>
+                                    </MudStack>
+                                }
+                            </MudStack>
+                        </MudItem>
+
+                    </MudGrid>
+                </MudForm>
+
+                <MudAlert Severity="Severity.Info" Class="mt-4" Dense="true"
+                          Style="border-radius:10px;">
+                    @T["contact.form.hint"]
+                </MudAlert>
+
+            </div>
+        </MudItem>
+
+    </MudGrid>
+</MudContainer>
+
+@code {
+    private MudForm  _form      = default!;
+    private bool     _formValid = false;
+    private bool     _sending   = false;
+    private bool     _sent      = false;
+
+    private ContactModel _model = new();
+
+    private sealed class ContactModel
+    {
+        public string Name          { get; set; } = "";
+        public string Company       { get; set; } = "";
+        public string Email         { get; set; } = "";
+        public string InquiryType   { get; set; } = "";
+        public string Subject       { get; set; } = "";
+        public string Message       { get; set; } = "";
+        public bool   AcceptPrivacy { get; set; }
+    }
+
+    private record ContactItem(string Icon, string Label, string Value, string Href, string Target = "_blank");
+    private record AvailabilityItem(string Label, bool Available);
+    private record FreelancerProfile(string Name, string Url, string Status);
+
+    private ContactItem[] _contactItems = [];
+    private AvailabilityItem[] _availability = [];
+    private FreelancerProfile[] _freelancerProfiles = [];
+    private string[] _inquiryTypes = [];
+
+    protected override void OnInitialized()
+    {
+        T.OnLanguageChanged += Refresh;
+        BuildData();
+    }
+
+    private void BuildData()
+    {
+        bool de = T.CurrentLanguage == "de";
+        bool tr = T.CurrentLanguage == "tr";
+
+        _contactItems =
+        [
+            new(Icons.Material.Filled.Email,    "E-Mail",   "mali.bayrak@web.de",
+                "mailto:mali.bayrak@web.de", "_self"),
+            new(Icons.Material.Filled.Language,  "LinkedIn", "m-ali-bayrak",
+                "https://www.linkedin.com/in/m-ali-bayrak-0a8036331/"),
+            new(Icons.Material.Filled.Code,      "GitHub",   "malibay81",
+                "https://github.com/malibay81"),
+        ];
+
+        _availability =
+        [
+            new(de ? "Softwareentwicklung (.NET / WPF / Blazor)"
+              : tr ? "Yazılım Geliştirme (.NET / WPF / Blazor)"
+              :      "Software Development (.NET / WPF / Blazor)", true),
+            new(de ? "Automatisierung (TwinCAT / S7)"
+              : tr ? "Otomasyon (TwinCAT / S7)"
+              :      "Automation (TwinCAT / S7)", true),
+        ];
+
+        _freelancerProfiles =
+        [
+            new("LinkedIn",        "https://www.linkedin.com/in/m-ali-bayrak-0a8036331/",
+                de ? "Aktiv" : tr ? "Etkin" : "Active"),
+            new("GitHub",          "https://github.com/malibay81",
+                de ? "Aktiv" : tr ? "Etkin" : "Active"),
+            new("freelancermap.de","https://www.freelancermap.de/profil/software-ingenieur-273904",
+                de ? "Aktiv" : tr ? "Aktif" : "Active"),
+            new("freelance.de",    "https://www.freelance.de/freelancer/315461-und-Software-Ingenieur",
+                de ? "Aktiv" : tr ? "Aktif" : "Active"),
+        ];
+
+        _inquiryTypes = de
+            ? ["Projektanfrage", "Beratung", "Zusammenarbeit", "Frage", "Sonstiges"]
+            : tr
+            ? ["Proje Talebi", "Danışmanlık", "İşbirliği", "Soru", "Diğer"]
+            : ["Project Inquiry", "Consulting", "Collaboration", "Question", "Other"];
+    }
+
+    private async Task Submit()
+    {
+        await _form.ValidateAsync();
+        if (!_formValid || !_model.AcceptPrivacy) return;
+
+        _sending = true;
+        StateHasChanged();
+
+        await Task.Delay(800);
+
+        var subject = Uri.EscapeDataString(_model.Subject);
+        var body    = Uri.EscapeDataString(
+            $"Name: {_model.Name}\n" +
+            $"Firma: {_model.Company}\n" +
+            $"E-Mail: {_model.Email}\n" +
+            $"Typ: {_model.InquiryType}\n\n" +
+            _model.Message);
+
+        var mailtoLink = $"mailto:mali.bayrak@web.de?subject={subject}&body={body}";
+
+        _sending = false;
+        _sent    = true;
+
+        bool de = T.CurrentLanguage == "de";
+        bool tr = T.CurrentLanguage == "tr";
+
+        Snackbar.Add(
+            de ? "✅ Nachricht vorbereitet — E-Mail-Client wird geöffnet."
+          : tr ? "✅ Mesaj hazırlandı — E-posta istemcisi açılıyor."
+          :      "✅ Message prepared — opening your e-mail client.",
+            Severity.Success,
+            cfg => { cfg.VisibleStateDuration = 5000; });
+
+        await Task.Delay(300);
+        Nav.NavigateTo(mailtoLink);
+
+        await Task.Delay(2500);
+        _model = new();
+        _sent  = false;
+        await _form.ResetAsync();
+        StateHasChanged();
+    }
+
+    private void Refresh() { BuildData(); StateHasChanged(); }
+
+    public void Dispose() => T.OnLanguageChanged -= Refresh;
+}

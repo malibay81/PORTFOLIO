@@ -1,0 +1,263 @@
+@inject TranslationService T
+@inject IJSRuntime JS
+@implements IDisposable
+
+<!-- ═══════════════════════════════════════════════════════════
+     ÜBER MICH
+════════════════════════════════════════════════════════════ -->
+<section id="about" style="background: linear-gradient(180deg, rgba(var(--mud-palette-primary-rgb),0.07) 0%, transparent 100%); padding: 80px 0 40px;">
+    <MudContainer MaxWidth="MaxWidth.Large">
+        <MudText Typo="Typo.overline" Color="Color.Primary" Style="letter-spacing:0.2em;">
+            @T["nav.about"]
+        </MudText>
+        <MudText Typo="Typo.h3" Class="gradient-text mt-1" Style="font-weight:700;">
+            @T["about.title"]
+        </MudText>
+        <MudText Typo="Typo.h6" Color="Color.Secondary" Class="mt-2" Style="font-weight:400; max-width:600px;">
+            @T["about.lead"]
+        </MudText>
+    </MudContainer>
+</section>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="pb-16">
+    <MudGrid Spacing="6">
+
+        <!-- LINKS: Profil + Branchen -->
+        <MudItem xs="12" md="5">
+            <div class="glass-card pa-6 mb-6">
+                <MudStack AlignItems="AlignItems.Center" Spacing="3">
+                    <MudAvatar Style="width:96px; height:96px; background: var(--gradient-primary); font-size:2.2rem; font-weight:700;">
+                        AB
+                    </MudAvatar>
+                    <div style="text-align:center;">
+                        <MudText Typo="Typo.h6" Style="font-weight:700;">M. Ali Bayrak</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">Dipl.-Ing. (FH) Mechatronik</MudText>
+                    </div>
+                    <div class="available-badge">
+                        <span class="dot"></span>
+                        @T["about.available"]
+                    </div>
+                </MudStack>
+
+                <MudDivider Class="my-4" />
+
+                <MudStack Spacing="2">
+                    <a href="mailto:mali.bayrak@web.de" class="contact-link">
+                        <MudIcon Icon="@Icons.Material.Filled.Email" Color="Color.Primary" />
+                        <div>
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">@T["contact.email"]</MudText>
+                            <MudText Typo="Typo.body2">mali.bayrak@web.de</MudText>
+                        </div>
+                    </a>
+                    <a href="https://www.linkedin.com/in/m-ali-bayrak-0a8036331/" target="_blank" class="contact-link">
+                        <MudIcon Icon="@Icons.Custom.Brands.LinkedIn" Color="Color.Primary" />
+                        <div>
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">LinkedIn</MudText>
+                            <MudText Typo="Typo.body2">M. Ali Bayrak</MudText>
+                        </div>
+                    </a>
+                    <a href="https://github.com/malibay81" target="_blank" class="contact-link">
+                        <MudIcon Icon="@Icons.Custom.Brands.GitHub" Color="Color.Primary" />
+                        <div>
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">GitHub</MudText>
+                            <MudText Typo="Typo.body2">malibay81</MudText>
+                        </div>
+                    </a>
+                </MudStack>
+            </div>
+
+            <div class="glass-card pa-6">
+                <MudText Typo="Typo.h6" Style="font-weight:700;" Class="mb-4">
+                    <MudIcon Icon="@Icons.Material.Filled.Factory" Class="mr-2" Size="Size.Small" />
+                    @_sectionTitles["industries"]
+                </MudText>
+                <MudStack Spacing="2">
+                    @foreach (var industry in _industries)
+                    {
+                        <MudChip T="string" Icon="@industry.Icon" Color="Color.Primary" Variant="Variant.Outlined" Size="Size.Small">
+                            @industry.Label
+                        </MudChip>
+                    }
+                </MudStack>
+            </div>
+        </MudItem>
+
+        <!-- RECHTS: Bio + Erfahrung + Ausbildung + Skills -->
+        <MudItem xs="12" md="7">
+
+            <div class="glass-card pa-6 mb-6">
+                <MudText Typo="Typo.h6" Style="font-weight:700;" Class="mb-3">
+                    <MudIcon Icon="@Icons.Material.Filled.Person" Class="mr-2" Size="Size.Small" />
+                    @_sectionTitles["bio"]
+                </MudText>
+                <MudText Typo="Typo.body1" Style="line-height:1.8; color: var(--text-secondary);">
+                    @T["about.body"]
+                </MudText>
+            </div>
+
+            <div class="glass-card pa-6 mb-6">
+                <MudText Typo="Typo.h6" Style="font-weight:700;" Class="mb-4">
+                    <MudIcon Icon="@Icons.Material.Filled.Work" Class="mr-2" Size="Size.Small" />
+                    @_sectionTitles["experience"]
+                </MudText>
+                <MudTimeline TimelinePosition="TimelinePosition.Start" TimelineAlign="TimelineAlign.Start">
+                    @foreach (var exp in _experiences)
+                    {
+                        <MudTimelineItem Color="Color.Primary" Size="Size.Small" TimelineAlign="TimelineAlign.Start">
+                            <ItemContent>
+                                <MudText Typo="Typo.subtitle1" Style="font-weight:600;">@exp.Title</MudText>
+                                <MudText Typo="Typo.body2" Color="Color.Secondary">@exp.Company</MudText>
+                                <MudText Typo="Typo.caption" Color="Color.Primary">@exp.Period</MudText>
+                                <MudText Typo="Typo.body2" Class="mt-1" Style="color:var(--text-muted);">@exp.Description</MudText>
+                            </ItemContent>
+                        </MudTimelineItem>
+                    }
+                </MudTimeline>
+            </div>
+
+            <div class="glass-card pa-6 mb-6">
+                <MudText Typo="Typo.h6" Style="font-weight:700;" Class="mb-4">
+                    <MudIcon Icon="@Icons.Material.Filled.School" Class="mr-2" Size="Size.Small" />
+                    @_sectionTitles["education"]
+                </MudText>
+                @foreach (var edu in _education)
+                {
+                    <MudStack Row="true" AlignItems="AlignItems.Start" Spacing="3" Class="mb-3">
+                        <MudIcon Icon="@Icons.Material.Filled.MenuBook" Color="Color.Primary" />
+                        <div>
+                            <MudText Typo="Typo.subtitle2" Style="font-weight:600;">@edu.Degree</MudText>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">@edu.Institution</MudText>
+                            <MudText Typo="Typo.caption" Color="Color.Primary">@edu.Period</MudText>
+                            @if (!string.IsNullOrEmpty(edu.Note))
+                            {
+                                <MudText Typo="Typo.caption" Style="color:var(--text-muted);">@edu.Note</MudText>
+                            }
+                        </div>
+                    </MudStack>
+                }
+            </div>
+
+            <div class="glass-card pa-6">
+                <MudText Typo="Typo.h6" Style="font-weight:700;" Class="mb-4">
+                    <MudIcon Icon="@Icons.Material.Filled.Code" Class="mr-2" Size="Size.Small" />
+                    @T["skills.title"]
+                </MudText>
+                @foreach (var group in _skillGroups)
+                {
+                    <MudText Typo="Typo.caption" Color="Color.Secondary" Class="mb-2 mt-3" Style="letter-spacing:0.1em; text-transform:uppercase;">
+                        @group.Category
+                    </MudText>
+                    <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:8px;">
+                        @foreach (var skill in group.Skills)
+                        {
+                            <span class="skill-chip">@skill</span>
+                        }
+                    </div>
+                }
+
+                <MudDivider Class="my-4" />
+
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           FullWidth="true"
+                           Style="border-radius:12px;"
+                           EndIcon="@Icons.Material.Filled.ArrowForward"
+                           OnClick='() => JS.InvokeVoidAsync("pfScrollTo", "demos")'>
+                    @T["hero.cta.projects"]
+                </MudButton>
+            </div>
+
+        </MudItem>
+    </MudGrid>
+</MudContainer>
+
+@code {
+    private Dictionary<string, string> _sectionTitles = new();
+    private List<ExperienceItem> _experiences = [];
+    private List<EducationItem> _education = [];
+    private List<IndustryItem> _industries = [];
+    private List<SkillGroup> _skillGroups = [];
+
+    protected override void OnInitialized()
+    {
+        T.OnLanguageChanged += Refresh;
+        BuildData();
+    }
+
+    private void BuildData()
+    {
+        bool isDe = T.CurrentLanguage == "de";
+        bool isTr = T.CurrentLanguage == "tr";
+
+        _sectionTitles = new()
+        {
+            ["bio"]        = isDe ? "Über mich" : isTr ? "Hakkımda" : "About Me",
+            ["experience"] = isDe ? "Berufserfahrung" : isTr ? "Deneyim" : "Experience",
+            ["education"]  = isDe ? "Ausbildung" : isTr ? "Eğitim" : "Education",
+            ["industries"] = isDe ? "Branchen" : isTr ? "Sektörler" : "Industries"
+        };
+
+        _experiences =
+        [
+            new(
+                isDe ? "Projekt- & Softwareingenieur" : isTr ? "Proje & Yazılım Mühendisi" : "Project & Software Engineer",
+                "Vogelsang & Benning",
+                isDe ? "2008 – heute" : isTr ? "2008 – Günümüz" : "2008 – Present",
+                isDe ? "Entwicklung von Prüfstands- und Automatisierungssoftware für Elektromotoren, Pumpen und Automotive-Komponenten. Vollprojekte von der Beratung bis zur Inbetriebnahme."
+                     : isTr ? "Elektrik motorları, pompalar ve otomotiv bileşenleri için test ve otomasyon yazılımı geliştirme. Danışmanlıktan devreye almaya kadar tam proje yönetimi."
+                     : "Development of test bench and automation software for electric motors, pumps and automotive components. Full project management from consulting to commissioning."
+            )
+        ];
+
+        _education =
+        [
+            new(
+                "Dipl.-Ing. (FH) Mechatronik",
+                "Hochschule Bochum",
+                "2004 – 2008",
+                isDe ? "Diplomarbeit: Integration DT9836-Messkarte in Prüfstandsumgebung"
+                     : isTr ? "Bitirme tezi: DT9836 ölçüm kartının test ortamına entegrasyonu"
+                     : "Thesis: DT9836 measurement card integration into test environment"
+            )
+        ];
+
+        _industries =
+        [
+            new(Icons.Material.Filled.ElectricBolt,
+                isDe ? "Elektromotoren & Antriebe" : isTr ? "Elektrik Motorları" : "Electric Motors & Drives"),
+            new(Icons.Material.Filled.Water,
+                isDe ? "Pumpen & Hydraulik" : isTr ? "Pompalar & Hidrolik" : "Pumps & Hydraulics"),
+            new(Icons.Material.Filled.DirectionsCar,
+                isDe ? "Automobilindustrie" : isTr ? "Otomotiv Endüstrisi" : "Automotive Industry"),
+            new(Icons.Material.Filled.Build,
+                isDe ? "Sondermaschinenbau" : isTr ? "Özel Makine İmalatı" : "Special-Purpose Machinery"),
+            new(Icons.Material.Filled.Science,
+                isDe ? "Messtechnik" : isTr ? "Ölçüm Teknolojisi" : "Measurement Technology")
+        ];
+
+        _skillGroups =
+        [
+            new(".NET / C#", [".NET 10", "C#", "Blazor WASM", "WPF", "Windows Forms", "ASP.NET Core", "MVVM"]),
+            new(isDe ? "Datenbanken" : isTr ? "Veritabanları" : "Databases",
+                ["SQL Server", "SQLite", "PostgreSQL", "Entity Framework Core"]),
+            new(isDe ? "SPS / Automatisierung" : isTr ? "PLC / Otomasyon" : "PLC / Automation",
+                ["Siemens S7", "TIA Portal", "Beckhoff TwinCAT"]),
+            new(isDe ? "Messtechnik / Bus" : isTr ? "Ölçüm / Veri Yolu" : "Measurement / Bus",
+                ["Vector CANoe", "CANape", "CANalyzer", "CAN-Bus"]),
+            new("Tools & DevOps", ["Git", "GitHub Actions", "Azure DevOps", "Docker", "CI/CD"])
+        ];
+    }
+
+    private void Refresh()
+    {
+        BuildData();
+        StateHasChanged();
+    }
+
+    public void Dispose() => T.OnLanguageChanged -= Refresh;
+
+    private sealed record ExperienceItem(string Title, string Company, string Period, string Description);
+    private sealed record EducationItem(string Degree, string Institution, string Period, string Note);
+    private sealed record IndustryItem(string Icon, string Label);
+    private sealed record SkillGroup(string Category, List<string> Skills);
+}

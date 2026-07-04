@@ -1,0 +1,232 @@
+@inherits LayoutComponentBase
+@inject IJSRuntime JS
+@inject NavigationManager Nav
+@inject HttpClient Http
+@inject TranslationService T
+@implements IDisposable
+
+<MudThemeProvider Theme="_theme" IsDarkMode="_isDark" />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+    <MudAppBar Elevation="2" Dense="false">
+        <div @onclick='() => GoToSection("hero")' style="height:60px;width:auto;display:flex;align-items:center;cursor:pointer;margin-left:8px;color:var(--mud-palette-primary);filter:drop-shadow(0 0 5px var(--mud-palette-primary));">
+            @((MarkupString)_logoSvg)
+        </div>
+        <span @onclick='() => GoToSection("hero")' style="font-weight:700;font-size:1rem;letter-spacing:2px;margin-left:16px;color:var(--mud-palette-primary);text-shadow:0 0 10px var(--mud-palette-primary);cursor:pointer;">LYKON-TECH</span>
+
+        <MudSpacer />
+
+        <!-- Sektions-Navigation (Desktop) -->
+        <div class="d-none d-md-flex" style="gap:4px;">
+            <MudButton Color="Color.Inherit" OnClick='() => GoToSection("about")'>@T["nav.about"]</MudButton>
+            <MudButton Color="Color.Inherit" OnClick='() => GoToSection("demos")'>@T["nav.demos"]</MudButton>
+            <MudButton Color="Color.Inherit" OnClick='() => GoToSection("contact")'>@T["nav.contact"]</MudButton>
+        </div>
+
+        <!-- Sprache: immer sichtbare Flaggen-Buttons (DE/EN/TR) -->
+        <div style="display:flex; gap:2px; align-items:center; margin: 0 4px;">
+            @foreach (var lang in T.Languages)
+            {
+                var isActive = T.CurrentLanguage == lang.Code;
+                <MudTooltip Text="@lang.Label" Placement="Placement.Bottom">
+                    <MudButton Size="Size.Small"
+                               Color="@(isActive ? Color.Primary : Color.Inherit)"
+                               Variant="@(isActive ? Variant.Outlined : Variant.Text)"
+                               Style="min-width:40px; padding:4px 6px; font-size:1.05rem;"
+                               aria-label="@lang.Label"
+                               OnClick="() => SetLanguage(lang.Code)">
+                        @lang.Flag
+                    </MudButton>
+                </MudTooltip>
+            }
+        </div>
+
+        <!-- Akzentfarbe -->
+        <MudTooltip Text="Akzentfarbe" Placement="Placement.Bottom">
+            <label style="cursor:pointer;display:inline-flex;align-items:center;padding:6px;margin-left:2px;border-radius:50%;">
+                <MudIcon Icon="@Icons.Material.Filled.Colorize" Color="Color.Inherit" Size="Size.Small" />
+                <input type="color" value="@_currentAccent"
+                       @oninput="@(async e => await SetAccentHex(e.Value?.ToString() ?? _currentAccent))"
+                       style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;" />
+            </label>
+        </MudTooltip>
+
+        <!-- Dark/Light -->
+        <MudIconButton Icon="@(_isDark ? Icons.Material.Filled.LightMode : Icons.Material.Filled.DarkMode)"
+                       Color="Color.Inherit"
+                       OnClick="ToggleDark" />
+
+        <!-- Mobile Sektions-Navigation: kompakte Icons statt Menü -->
+        <div class="d-flex d-md-none" style="gap:0;">
+            <MudIconButton Icon="@Icons.Material.Filled.Person" Color="Color.Inherit" Size="Size.Small"
+                           aria-label="@T["nav.about"]" OnClick='() => GoToSection("about")' />
+            <MudIconButton Icon="@Icons.Material.Filled.Apps" Color="Color.Inherit" Size="Size.Small"
+                           aria-label="@T["nav.demos"]" OnClick='() => GoToSection("demos")' />
+            <MudIconButton Icon="@Icons.Material.Filled.Email" Color="Color.Inherit" Size="Size.Small"
+                           aria-label="@T["nav.contact"]" OnClick='() => GoToSection("contact")' />
+        </div>
+    </MudAppBar>
+
+    <MudMainContent>
+        @Body
+    </MudMainContent>
+
+    <MudAppBar Bottom="true" Elevation="2" Dense="true">
+        <MudText Typo="Typo.caption" Color="Color.Secondary">
+            © @DateTime.Now.Year M. Ali Bayrak · LYKON-TECH · @T["footer.rights"]
+            · <MudLink Href="/impressum" Typo="Typo.caption" Color="Color.Secondary">Impressum</MudLink>
+            · <MudLink Href="/datenschutz" Typo="Typo.caption" Color="Color.Secondary">Datenschutz</MudLink>
+        </MudText>
+        <MudSpacer />
+        <lottie-player src="wolf-animation.json"
+                       background="transparent"
+                       speed="1"
+                       style="height:44px;width:auto;"
+                       loop
+                       autoplay>
+        </lottie-player>
+        <MudSpacer />
+        <MudTooltip Text="GitHub" Placement="Placement.Top">
+            <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit" Size="Size.Small"
+                           Href="https://github.com/malibay81" Target="_blank" />
+        </MudTooltip>
+        <MudTooltip Text="LinkedIn" Placement="Placement.Top">
+            <MudIconButton Icon="@Icons.Custom.Brands.LinkedIn" Color="Color.Inherit" Size="Size.Small"
+                           Href="https://www.linkedin.com/in/m-ali-bayrak-0a8036331/" Target="_blank" />
+        </MudTooltip>
+    </MudAppBar>
+</MudLayout>
+
+@code {
+    private bool _isDark = true;
+    private string _currentAccent = "#38bdf8";
+    private MudTheme _theme = BuildTheme("#38bdf8");
+    private string _logoSvg = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        T.OnLanguageChanged += OnLanguageChanged;
+        try
+        {
+            var svg = await Http.GetStringAsync("logo.svg");
+            _logoSvg = svg.Replace("<svg", "<svg style=\"height:60px;width:auto;\"");
+        }
+        catch { /* Logo ist optional – Text-Branding bleibt sichtbar. */ }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+
+        var darkPref = await JS.InvokeAsync<string?>("localStorage.getItem", "pf-dark");
+        _isDark = darkPref != "false";
+
+        var accentHex = await JS.InvokeAsync<string?>("localStorage.getItem", "pf-accent");
+        if (!string.IsNullOrEmpty(accentHex))
+        {
+            _currentAccent = accentHex;
+            _theme = BuildTheme(accentHex);
+        }
+
+        var lang = await JS.InvokeAsync<string?>("localStorage.getItem", "pf-lang");
+        if (!string.IsNullOrEmpty(lang) && T.Languages.Any(l => l.Code == lang))
+            T.SetLanguage(lang);
+
+        StateHasChanged();
+    }
+
+    private async Task ToggleDark()
+    {
+        _isDark = !_isDark;
+        await JS.InvokeVoidAsync("localStorage.setItem", "pf-dark", _isDark ? "true" : "false");
+    }
+
+    private async Task SetAccentHex(string hex)
+    {
+        _currentAccent = hex;
+        _theme = BuildTheme(hex);
+        await JS.InvokeVoidAsync("localStorage.setItem", "pf-accent", hex);
+        StateHasChanged();
+    }
+
+    private async Task SetLanguage(string code)
+    {
+        T.SetLanguage(code);
+        await JS.InvokeVoidAsync("localStorage.setItem", "pf-lang", code);
+    }
+
+    private async Task GoToSection(string id)
+    {
+        // Von Unterseiten (Impressum/Datenschutz) erst zur One-Page zurück.
+        var path = new Uri(Nav.Uri).AbsolutePath;
+        var basePath = new Uri(Nav.BaseUri).AbsolutePath;
+        if (!string.Equals(path.TrimEnd('/'), basePath.TrimEnd('/'), StringComparison.OrdinalIgnoreCase))
+        {
+            Nav.NavigateTo("");
+            await Task.Delay(150);
+        }
+        await JS.InvokeVoidAsync("pfScrollTo", id);
+    }
+
+    private void OnLanguageChanged() => InvokeAsync(StateHasChanged);
+
+    public void Dispose() => T.OnLanguageChanged -= OnLanguageChanged;
+
+    private static MudTheme BuildTheme(string hex) => new MudTheme
+    {
+        PaletteDark = new PaletteDark
+        {
+            Primary = hex,
+            PrimaryContrastText = "#000000",
+            Secondary = "#818cf8",
+            SecondaryContrastText = "#ffffff",
+            Tertiary = "#38bdf8",
+            TertiaryContrastText = "#000000",
+            Background = "#0d1117",
+            BackgroundGray = "#090d13",
+            Surface = "#161b22",
+            DrawerBackground = "#0d1117",
+            DrawerText = "#e6edf3",
+            AppbarBackground = "#161b22",
+            AppbarText = "#e6edf3",
+            TextPrimary = "#e6edf3",
+            TextSecondary = "#8b949e",
+            LinesDefault = "#30363d",
+            TableLines = "#30363d",
+            Divider = "#30363d",
+            Error = "#e05c6a",
+            Warning = "#d29922",
+            Success = hex,
+            Info = "#38bdf8",
+            ActionDefault = "#8b949e",
+            ActionDisabled = "#484f58",
+            ActionDisabledBackground = "#21262d",
+        },
+        PaletteLight = new PaletteLight
+        {
+            Primary = hex,
+            PrimaryContrastText = "#ffffff",
+            Secondary = "#6366f1",
+            SecondaryContrastText = "#ffffff",
+            Tertiary = "#0ea5e9",
+            TertiaryContrastText = "#ffffff",
+            Background = "#f0f4f8",
+            Surface = "#ffffff",
+            DrawerBackground = "#f6f8fa",
+            DrawerText = "#24292f",
+            AppbarBackground = "#ffffff",
+            AppbarText = "#24292f",
+            TextPrimary = "#24292f",
+            TextSecondary = "#57606a",
+            LinesDefault = "#d0d7de",
+            TableLines = "#d0d7de",
+            Divider = "#d0d7de",
+            Error = "#e05c6a",
+            Warning = "#d97706",
+            Info = "#0ea5e9",
+        }
+    };
+}
