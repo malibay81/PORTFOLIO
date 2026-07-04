@@ -1,46 +1,33 @@
-# Portfolio – M. Ali Bayrak · LYKON-TECH
+# Hallo, ich bin M. Ali Bayrak 👋
 
-Mehrsprachige Portfolio-One-Page (DE / EN / TR) als **Blazor WebAssembly**-App –
-Quellcode bewusst öffentlich als C#-Showcase.
+**Software-Ingenieur & .NET-Spezialist** · Dipl.-Ing. (FH) Mechatronik
 
-**Live:**
-- 🌐 [lykon-tech.de](https://lykon-tech.de) (Hetzner, Hauptdomain)
-- 📄 [malibay81.github.io/PORTFOLIO](https://malibay81.github.io/PORTFOLIO/) (GitHub Pages)
+Seit 2008 entwickle ich Softwarelösungen für anspruchsvolle Industrieprojekte —
+Schwerpunkt C# / .NET, WPF, Blazor sowie die Integration von SPS-Systemen
+(Siemens, Beckhoff) und Messtechnik-Werkzeugen (Vector CANoe/CANape).
+Verfügbar für nebenberufliche Projekte.
 
-> *English: Multilingual portfolio one-pager (German / English / Turkish) built
-> with Blazor WebAssembly. The source is intentionally public as a C# showcase.*
+🌐 **Portfolio:** [lykon-tech.de](https://lykon-tech.de) · [malibay81.github.io/PORTFOLIO](https://malibay81.github.io/PORTFOLIO/)
 
-## Features
+📫 [LinkedIn](https://www.linkedin.com/in/m-ali-bayrak-0a8036331/) ·
+[E-Mail](mailto:mali.bayrak@web.de) ·
+[freelancermap](https://www.freelancermap.de/profil/software-ingenieur-273904) ·
+[freelance.de](https://www.freelance.de/freelancer/315461-und-Software-Ingenieur)
 
-- **One-Page-Aufbau**: Hero mit Typewriter-Effekt, Über mich, Tech-Stack,
-  Projekte/Live-Demos, Kontakt – plus Impressum & Datenschutz als Unterseiten
-- **Dreisprachig** (Deutsch, Englisch, Türkisch) mit Sprachumschalter,
-  Auswahl wird im localStorage gemerkt
-- **Berufserfahrung dynamisch**: wird immer ab Karrierestart **2008** berechnet –
-  veraltet nie
-- **Demo-Karten datengetrieben**: neue Demo = ein Eintrag in
-  [`wwwroot/data/demos.json`](src/Portfolio/wwwroot/data/demos.json)
-  (Status `live` / `dev` / `planned`, GitHub- und Live-Link)
-- **Dark/Light-Mode** (dunkel als Standard) und frei wählbare Akzentfarbe
-- **DSGVO-freundlich**: Fonts & Skripte self-hosted, keine Third-Party-Requests,
-  keine Cookies, Kontaktformular rein per `mailto`
+> *English: Software engineer & .NET specialist, building industrial software
+> since 2008 — special-purpose machinery, automotive, test benches and
+> automation. Available for freelance projects.*
 
-## Tech-Stack
+---
 
-.NET 10 · Blazor WebAssembly · MudBlazor · CSS (Glassmorphism) · GitHub Actions
-
-## Lokal starten
+Dies ist der Quellcode meiner Portfolio-Website (Blazor WebAssembly, DE/EN/TR,
+bewusst öffentlich als C#-Showcase). Lokal starten:
 
 ```bash
 dotnet run --project src/Portfolio/Portfolio.csproj
 ```
 
-## Deployment
-
-`main` ist der einzige Deploy-Branch: Ein GitHub-Actions-Workflow baut die App
-bei jedem Push automatisch und veröffentlicht sie auf GitHub Pages sowie auf
-einem privaten Server (Details im Workflow:
-[`.github/workflows/deploy.yml`](.github/workflows/deploy.yml)).
+`main` wird automatisch per GitHub Actions deployt (GitHub Pages + privater Server).
 
 ## Lizenz
 
