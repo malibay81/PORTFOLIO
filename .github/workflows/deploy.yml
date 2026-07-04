@@ -75,7 +75,9 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
-  deploy-hetzner:
+  # Statische Build-Dateien per rsync nach /var/www/portfolio (wird von Caddy
+  # read-only gemountet, siehe docker-compose.yml).
+  deploy-hetzner-files:
     needs: build
     runs-on: ubuntu-latest
     # Läuft erst, wenn die SSH-Secrets im Repo hinterlegt sind.
@@ -96,3 +98,26 @@ jobs:
           remote_host: ${{ secrets.HETZNER_HOST }}
           remote_user: ${{ secrets.HETZNER_USER }}
           remote_key: ${{ secrets.HETZNER_SSH_KEY }}
+
+  # Caddy/docker-compose dieses Repos auf dem Server aktuell halten (Caddyfile,
+  # Reverse-Proxy-Regeln). Läuft unabhängig vom Dateien-Job oben.
+  deploy-hetzner-infra:
+    needs: build
+    runs-on: ubuntu-latest
+    if: ${{ needs.build.outputs.has_hetzner == 'true' }}
+    steps:
+      - name: Caddy-Stack auf dem Server aktualisieren
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.HETZNER_HOST }}
+          username: ${{ secrets.HETZNER_USER }}
+          key: ${{ secrets.HETZNER_SSH_KEY }}
+          passphrase: ${{ secrets.HETZNER_SSH_PASSPHRASE }}
+          script: |
+            set -euo pipefail
+            docker network inspect web >/dev/null 2>&1 || docker network create web
+            cd /var/www/portfolio-infra
+            git fetch origin main
+            git checkout main
+            git pull origin main
+            docker compose up -d --build

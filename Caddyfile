@@ -1,0 +1,33 @@
+# ── lykon-tech.de: Domain-Aufteilung ────────────────────────────────
+# Hauptdomain  → statisches Portfolio (dieses Repo)
+# cockpit.*    → Blazor-Server-App (Container "cockpit", Repo: malibay81/COCKPIT)
+# Weitere Demos später nach demselben Muster:
+#   <demo>.lykon-tech.de { reverse_proxy <container>:<port> }
+#
+# Diese Datei + docker-compose.yml gehören bewusst zum Portfolio-Repo, nicht
+# zu COCKPIT: Caddy ist die "Verkehrsregelung" für die eigene Domain und läuft
+# unabhängig davon, welche Server-Apps gerade existieren oder online sind.
+# Verbindung zu anderen Containern (z. B. "cockpit") läuft über das externe
+# Docker-Netzwerk "web" (einmalig auf dem Server: `docker network create web`,
+# jeder Server-App-Container muss diesem Netzwerk beitreten).
+#
+# Voraussetzungen:
+# - DNS: A-Record lykon-tech.de → Server-IP und Wildcard *.lykon-tech.de → Server-IP
+# - Statische Portfolio-Dateien liegen auf dem Host unter /var/www/portfolio
+#   (wird vom Deploy-Workflow dieses Repos per rsync befüllt)
+# - Caddy stellt Let's-Encrypt-Zertifikate pro (Sub-)Domain automatisch aus.
+
+lykon-tech.de {
+    root * /srv/portfolio
+    encode gzip
+    try_files {path} /index.html
+    file_server
+}
+
+www.lykon-tech.de {
+    redir https://lykon-tech.de{uri} permanent
+}
+
+cockpit.lykon-tech.de {
+    reverse_proxy cockpit:8080
+}

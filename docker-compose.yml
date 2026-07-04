@@ -1,0 +1,29 @@
+# Läuft den Caddy-Reverse-Proxy für lykon-tech.de. Erreicht andere Server-Apps
+# (z. B. den "cockpit"-Container aus dem COCKPIT-Repo) über das externe
+# Docker-Netzwerk "web" – einmalig auf dem Host anlegen:
+#   docker network create web
+# Jede Server-App (eigenes Repo, eigenes docker-compose.yml) muss diesem
+# Netzwerk beitreten, damit Caddy sie unter <name>:<port> erreichen kann.
+services:
+  caddy:
+    image: caddy:2
+    container_name: caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - /var/www/portfolio:/srv/portfolio:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    networks:
+      - web
+
+networks:
+  web:
+    external: true
+
+volumes:
+  caddy-data:
+  caddy-config:
