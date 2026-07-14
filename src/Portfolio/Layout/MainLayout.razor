@@ -26,7 +26,11 @@
             <MudButton Color="Color.Inherit" OnClick='() => GoToSection("contact")'>@T["nav.contact"]</MudButton>
         </div>
 
-        <!-- Sprache: immer sichtbare Flaggen-Buttons (DE/EN/TR) -->
+        <!-- Sprache: immer sichtbare Flaggen-Buttons (DE/EN/TR).
+             Selbst gehostete SVG-Flaggen statt Emoji: Flaggen-Emojis werden auf
+             Windows grundsätzlich nicht als Grafik gerendert, sondern nur als
+             zweistelliger Ländercode-Text angezeigt (Microsoft-Designentscheidung) -
+             mit SVGs sieht es auf jedem Betriebssystem gleich aus. -->
         <div style="display:flex; gap:2px; align-items:center; margin: 0 4px;">
             @foreach (var lang in T.Languages)
             {
@@ -35,10 +39,11 @@
                     <MudButton Size="Size.Small"
                                Color="@(isActive ? Color.Primary : Color.Inherit)"
                                Variant="@(isActive ? Variant.Outlined : Variant.Text)"
-                               Style="min-width:40px; padding:4px 6px; font-size:1.05rem;"
+                               Style="min-width:40px; padding:4px 6px;"
                                aria-label="@lang.Label"
                                OnClick="() => SetLanguage(lang.Code)">
-                        @lang.Flag
+                        <img src="@($"flags/{lang.Code}.svg")" alt="@lang.Label"
+                             style="width:22px; height:15px; border-radius:3px; box-shadow:0 0 0 1px rgba(255,255,255,0.15); display:block;" />
                     </MudButton>
                 </MudTooltip>
             }

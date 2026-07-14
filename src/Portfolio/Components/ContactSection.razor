@@ -1,6 +1,7 @@
 @inject TranslationService T
 @inject NavigationManager Nav
 @inject ISnackbar Snackbar
+@inject IJSRuntime JS
 @implements IDisposable
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -26,7 +27,7 @@
         <!-- LINKS: Direktkontakt + Verfügbarkeit + Profile -->
         <MudItem xs="12" md="5">
 
-            <div class="glass-card pa-5 mb-4">
+            <div class="glass-card pf-reveal pa-5 mb-4">
                 <MudText Typo="Typo.subtitle1" Style="font-weight:700; margin-bottom:16px;">
                     <MudIcon Icon="@Icons.Material.Filled.ContactMail" Class="mr-2" Size="Size.Small" Color="Color.Primary" />
                     @T["contact.direct"]
@@ -35,7 +36,7 @@
                 @foreach (var item in _contactItems)
                 {
                     <a href="@item.Href" target="@item.Target" style="text-decoration:none; display:block;">
-                        <div class="glass-card pa-3 mb-2"
+                        <div class="glass-card pf-reveal pa-3 mb-2"
                              style="cursor:pointer; border-radius:10px; transition: all 0.2s;">
                             <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="3">
                                 <div style="width:40px; height:40px; border-radius:10px; display:flex;
@@ -56,7 +57,7 @@
                 }
             </div>
 
-            <div class="glass-card pa-5 mb-4">
+            <div class="glass-card pf-reveal pa-5 mb-4">
                 <MudText Typo="Typo.subtitle1" Style="font-weight:700; margin-bottom:16px;">
                     <MudIcon Icon="@Icons.Material.Filled.EventAvailable" Class="mr-2" Size="Size.Small" Color="Color.Secondary" />
                     @T["contact.availability"]
@@ -85,7 +86,7 @@
                 </MudText>
             </div>
 
-            <div class="glass-card pa-5">
+            <div class="glass-card pf-reveal pa-5">
                 <MudText Typo="Typo.subtitle1" Style="font-weight:700; margin-bottom:16px;">
                     <MudIcon Icon="@Icons.Material.Filled.Work" Class="mr-2" Size="Size.Small" Color="Color.Primary" />
                     @T["contact.profiles"]
@@ -93,7 +94,7 @@
                 @foreach (var p in _freelancerProfiles)
                 {
                     <a href="@p.Url" target="_blank" style="text-decoration:none; display:block;">
-                        <div class="glass-card pa-3 mb-2" style="cursor:pointer; border-radius:10px; transition: all 0.2s;">
+                        <div class="glass-card pf-reveal pa-3 mb-2" style="cursor:pointer; border-radius:10px; transition: all 0.2s;">
                             <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
                                 <MudIcon Icon="@Icons.Material.Filled.Link" Color="Color.Primary" Size="Size.Small" />
                                 <MudText Typo="Typo.body2" Style="font-weight:500; flex:1;">@p.Name</MudText>
@@ -108,7 +109,7 @@
 
         <!-- RECHTS: Kontaktformular (mailto, kein Backend) -->
         <MudItem xs="12" md="7">
-            <div class="glass-card pa-6">
+            <div class="glass-card pf-reveal pa-6">
                 <MudText Typo="Typo.subtitle1" Style="font-weight:700; margin-bottom:24px;">
                     <MudIcon Icon="@Icons.Material.Filled.Email" Class="mr-2" Size="Size.Small" Color="Color.Primary" />
                     @T["contact.form.title"]
@@ -272,6 +273,9 @@
     private AvailabilityItem[] _availability = [];
     private FreelancerProfile[] _freelancerProfiles = [];
     private string[] _inquiryTypes = [];
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+        => await JS.InvokeVoidAsync("pfInitReveal");
 
     protected override void OnInitialized()
     {

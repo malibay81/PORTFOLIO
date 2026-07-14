@@ -2,10 +2,10 @@
 @implements IDisposable
 
 <!-- ═══════════════════════════════════════════════════════════
-     HERO
+     HERO ("Banner") — bewusst breiter als der Rest der Seite
 ════════════════════════════════════════════════════════════ -->
-<section id="hero" class="hero-section">
-    <MudContainer MaxWidth="MaxWidth.Large">
+<section id="hero" class="hero-section hero-section--full-bleed">
+    <MudContainer MaxWidth="MaxWidth.False">
         <MudGrid Justify="Justify.Center">
             <MudItem xs="12" md="7" lg="6">
                 <div class="hero-content">
@@ -70,7 +70,7 @@
 </section>
 
 <!-- ═══════════════════════════════════════════════════════════
-     QUICK STATS
+     QUICK STATS (Zahlen zählen beim Laden hoch)
 ════════════════════════════════════════════════════════════ -->
 <MudContainer MaxWidth="MaxWidth.Large" Class="section">
     <MudGrid Justify="Justify.Center" Spacing="4">
@@ -79,7 +79,7 @@
             <MudItem xs="6" sm="3">
                 <div class="glass-card pa-6 text-center">
                     <MudText Typo="Typo.h3" Class="gradient-text" Style="font-weight:800;">
-                        @stat.Value
+                        @stat.Current@(stat.Suffix)
                     </MudText>
                     <MudText Typo="Typo.body2" Color="Color.Secondary" Class="mt-1">
                         @stat.Label
@@ -140,13 +140,45 @@
         "JetBrains Rider", "Visual Studio"
     ];
 
-    private List<(string Value, string Label)> _stats = [];
+    private sealed class Stat
+    {
+        public int Target { get; init; }
+        public string Suffix { get; init; } = "";
+        public string Label { get; init; } = "";
+        public int Current { get; set; }
+    }
+
+    private List<Stat> _stats = [];
+    private bool _countedUp;
 
     protected override void OnInitialized()
     {
         T.OnLanguageChanged += Refresh;
         BuildTypewriterWords();
         BuildStats();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender || _countedUp) return;
+        _countedUp = true;
+        await CountUpStats();
+    }
+
+    private async Task CountUpStats()
+    {
+        const int steps = 24;
+        const int stepDelayMs = 28;
+        for (var i = 1; i <= steps; i++)
+        {
+            foreach (var stat in _stats)
+                stat.Current = (int)Math.Round(stat.Target * (i / (double)steps));
+            StateHasChanged();
+            await Task.Delay(stepDelayMs);
+        }
+        foreach (var stat in _stats)
+            stat.Current = stat.Target;
+        StateHasChanged();
     }
 
     private async Task ScrollTo(string id) => await JS.InvokeVoidAsync("pfScrollTo", id);
@@ -163,21 +195,26 @@
 
     private void BuildStats()
     {
+        var wasCountedUp = _countedUp;
         _stats =
         [
-            (ExperienceYears.ToString(), T.CurrentLanguage == "de" ? "Jahre Erfahrung"
+            new Stat { Target = ExperienceYears, Suffix = "", Label = T.CurrentLanguage == "de" ? "Jahre Erfahrung"
                    : T.CurrentLanguage == "tr" ? "Yıl Deneyim"
-                   : "Years Experience"),
-            ("50+",  T.CurrentLanguage == "de" ? "Projekte"
+                   : "Years Experience" },
+            new Stat { Target = 50, Suffix = "+", Label = T.CurrentLanguage == "de" ? "Projekte"
                    : T.CurrentLanguage == "tr" ? "Proje"
-                   : "Projects"),
-            ("10+",  T.CurrentLanguage == "de" ? "Technologien"
+                   : "Projects" },
+            new Stat { Target = 10, Suffix = "+", Label = T.CurrentLanguage == "de" ? "Technologien"
                    : T.CurrentLanguage == "tr" ? "Teknoloji"
-                   : "Technologies"),
-            ("3",    T.CurrentLanguage == "de" ? "Sprachen"
+                   : "Technologies" },
+            new Stat { Target = 3, Suffix = "", Label = T.CurrentLanguage == "de" ? "Sprachen"
                    : T.CurrentLanguage == "tr" ? "Dil"
-                   : "Languages"),
+                   : "Languages" },
         ];
+        // Nach einem Sprachwechsel sofort den Endwert zeigen statt erneut hochzuzählen.
+        if (wasCountedUp)
+            foreach (var stat in _stats)
+                stat.Current = stat.Target;
     }
 
     private void Refresh()

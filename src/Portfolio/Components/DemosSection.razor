@@ -1,5 +1,6 @@
 @inject TranslationService T
 @inject DemoProjectService Demos
+@inject IJSRuntime JS
 @implements IDisposable
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -24,7 +25,7 @@
         @foreach (var demo in _demos)
         {
             <MudItem xs="12" sm="6" lg="4">
-                <div class="glass-card project-card @(demo.Status == "live" ? "project-card--highlighted" : "")"
+                <div class="glass-card pf-reveal project-card @(demo.Status == "live" ? "project-card--highlighted" : "")"
                      style="height:100%; display:flex; flex-direction:column; padding:0; overflow:hidden;">
 
                     <div style="padding:24px 24px 16px;">
@@ -102,6 +103,11 @@
         T.OnLanguageChanged += Refresh;
         _demos = await Demos.GetAllAsync();
     }
+
+    // Erneuter Aufruf nötig, da die Demo-Karten erst nach dem asynchronen
+    // Laden von demos.json entstehen (pfInitReveal ist idempotent).
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+        => await JS.InvokeVoidAsync("pfInitReveal");
 
     private string GetTitle(DemoProject d) => T.CurrentLanguage switch
     {

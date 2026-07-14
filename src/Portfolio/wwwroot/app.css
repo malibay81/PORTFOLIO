@@ -2,13 +2,25 @@
     box-sizing: border-box;
 }
 
-/* ── Ambient background gradient ── */
+/* ── Ambient background gradient (dezent in Bewegung) ── */
 body {
     background-image:
         radial-gradient(ellipse 60% 40% at 5% 10%, rgba(56, 189, 248, 0.08) 0%, transparent 60%),
         radial-gradient(ellipse 50% 60% at 95% 90%, rgba(99, 102, 241, 0.07) 0%, transparent 60%),
         radial-gradient(ellipse 40% 30% at 50% 50%, rgba(14, 165, 233, 0.04) 0%, transparent 70%);
     background-attachment: fixed;
+    background-size: 140% 140%, 140% 140%, 160% 160%;
+    animation: pf-bg-drift 28s ease-in-out infinite alternate;
+}
+
+@keyframes pf-bg-drift {
+    0%   { background-position: 0% 0%,   100% 100%, 50% 50%; }
+    50%  { background-position: 15% 10%, 85% 90%,   55% 45%; }
+    100% { background-position: 5% 15%,  95% 80%,   45% 55%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    body { animation: none; }
 }
 
 /* ── Glossy glass – content papers & cards ── */
@@ -179,7 +191,7 @@ html[data-theme="light"] .mud-paper:not(.mud-appbar):not(.mud-bottom-appbar),
     margin: 16px auto 0;
 }
 
-/* -- Hero Section -- */
+/* -- Hero Section ("Banner") -- */
 .portfolio-page .hero-section {
     min-height: 60vh;
     display: flex;
@@ -187,6 +199,24 @@ html[data-theme="light"] .mud-paper:not(.mud-appbar):not(.mud-bottom-appbar),
     padding: 48px 0;
     position: relative;
     overflow: hidden;
+}
+
+/* Voll breites, farbig abgesetztes Banner (spannt bis zum Bildschirmrand,
+   deutlich breiter als die darunterliegenden Sektionen). */
+.portfolio-page .hero-section--full-bleed {
+    width: 100%;
+    background: linear-gradient(
+        90deg,
+        rgba(var(--mud-palette-primary-rgb), 0.12) 0%,
+        rgba(var(--mud-palette-secondary-rgb), 0.07) 50%,
+        rgba(var(--mud-palette-primary-rgb), 0.12) 100%
+    );
+}
+
+.portfolio-page .hero-section--full-bleed > .mud-container {
+    max-width: 100% !important;
+    padding-left: clamp(24px, 6vw, 80px);
+    padding-right: clamp(24px, 6vw, 80px);
 }
 
 .portfolio-page .hero-section::before {
@@ -372,6 +402,63 @@ html[data-theme="light"] .mud-paper:not(.mud-appbar):not(.mud-bottom-appbar),
         font-size: 0.75rem !important;
         white-space: nowrap;
     }
+}
+
+/* -- Scroll-Reveal (siehe wwwroot/js/reveal.js) -- */
+.portfolio-page .pf-reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.portfolio-page .pf-reveal.pf-in {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Gestaffelter Effekt in Karten-Grids (Demo-Karten, Kontakt-Spalten) */
+.portfolio-page .pf-reveal:nth-child(2)  { transition-delay: 0.08s; }
+.portfolio-page .pf-reveal:nth-child(3)  { transition-delay: 0.16s; }
+.portfolio-page .pf-reveal:nth-child(4)  { transition-delay: 0.24s; }
+.portfolio-page .pf-reveal:nth-child(5)  { transition-delay: 0.32s; }
+.portfolio-page .pf-reveal:nth-child(6)  { transition-delay: 0.4s; }
+
+@media (prefers-reduced-motion: reduce) {
+    .portfolio-page .pf-reveal {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+}
+
+/* -- Shimmer-Sweep über Glass-Cards beim Hover -- */
+.portfolio-page .glass-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.portfolio-page .glass-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -60%;
+    width: 40%; height: 100%;
+    background: linear-gradient(115deg, transparent, rgba(255,255,255,0.10), transparent);
+    transform: skewX(-20deg);
+    transition: left 0.7s ease;
+    pointer-events: none;
+}
+
+.portfolio-page .glass-card:hover::after {
+    left: 130%;
+}
+
+/* -- Icon-Bounce in Demo-Karten -- */
+.portfolio-page .project-icon-wrap {
+    transition: transform var(--transition-med);
+}
+
+.portfolio-page .project-card:hover .project-icon-wrap {
+    transform: scale(1.12) rotate(-4deg);
 }
 
 /* -- Animations -- */
