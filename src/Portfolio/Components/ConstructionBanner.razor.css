@@ -1,0 +1,68 @@
+.construction-banner {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 10px;
+    margin: 0 6px;
+    background: #1a1a1a;
+    color: #facc15;
+    font-weight: 700;
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.construction-banner::before,
+.construction-banner::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: repeating-linear-gradient(-45deg, #facc15 0 10px, #1a1a1a 10px 20px);
+    background-size: 200% 100%;
+    animation: cb-stripe-scroll 1.2s linear infinite;
+}
+
+.construction-banner::before {
+    top: 0;
+}
+
+.construction-banner::after {
+    bottom: 0;
+}
+
+.construction-banner__icon {
+    color: #facc15 !important;
+    animation: cb-wiggle 1.6s ease-in-out infinite;
+}
+
+@keyframes cb-stripe-scroll {
+    from {
+        background-position: 0 0;
+    }
+    to {
+        background-position: 28px 0;
+    }
+}
+
+@keyframes cb-wiggle {
+    0%, 100% {
+        transform: rotate(-12deg);
+    }
+    50% {
+        transform: rotate(12deg);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .construction-banner::before,
+    .construction-banner::after,
+    .construction-banner__icon {
+        animation: none;
+    }
+}

@@ -19,6 +19,9 @@ public class TranslationService
         // ── DEUTSCH ───────────────────────────────────────────────
         ["de"] = new()
         {
+            // Banner
+            ["banner.construction"] = "Im Aufbau",
+
             // Navigation
             ["nav.home"]        = "Startseite",
             ["nav.about"]       = "Über mich",
@@ -96,6 +99,9 @@ public class TranslationService
         // ── ENGLISH ───────────────────────────────────────────────
         ["en"] = new()
         {
+            // Banner
+            ["banner.construction"] = "Under Construction",
+
             ["nav.home"]        = "Home",
             ["nav.about"]       = "About",
             ["nav.projects"]    = "Projects",
@@ -164,6 +170,9 @@ public class TranslationService
         // ── TÜRKÇE ────────────────────────────────────────────────
         ["tr"] = new()
         {
+            // Banner
+            ["banner.construction"] = "Yapım Aşamasında",
+
             ["nav.home"]        = "Ana Sayfa",
             ["nav.about"]       = "Hakkımda",
             ["nav.projects"]    = "Projeler",

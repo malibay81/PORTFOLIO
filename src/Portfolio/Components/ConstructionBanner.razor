@@ -1,0 +1,11 @@
+@inject TranslationService T
+
+<div class="construction-banner @Class" role="status" aria-label="@T["banner.construction"]">
+    <MudIcon Icon="@Icons.Material.Filled.Construction" Size="Size.Small" Class="construction-banner__icon" />
+    <span class="construction-banner__text d-none d-sm-inline">@T["banner.construction"]</span>
+</div>
+
+@code {
+    [Parameter]
+    public string Class { get; set; } = "";
+}
