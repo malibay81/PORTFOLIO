@@ -1,11 +1,21 @@
 @inject TranslationService T
+@implements IDisposable
 
 <div class="construction-banner @Class" role="status" aria-label="@T["banner.construction"]">
-    <MudIcon Icon="@Icons.Material.Filled.Construction" Size="Size.Small" Class="construction-banner__icon" />
+    <MudIcon Icon="@Icons.Material.Filled.Construction" Size="Size.Medium" Class="construction-banner__icon" />
     <span class="construction-banner__text d-none d-sm-inline">@T["banner.construction"]</span>
 </div>
 
 @code {
     [Parameter]
     public string Class { get; set; } = "";
+
+    // Ohne dieses Abo reagiert der Banner nicht auf Sprachwechsel: ein
+    // StateHasChanged im übergeordneten MainLayout rendert Kind-Komponenten
+    // nur neu, wenn sich deren Parameter ändern - "Class" bleibt aber gleich.
+    protected override void OnInitialized() => T.OnLanguageChanged += Refresh;
+
+    private void Refresh() => InvokeAsync(StateHasChanged);
+
+    public void Dispose() => T.OnLanguageChanged -= Refresh;
 }
